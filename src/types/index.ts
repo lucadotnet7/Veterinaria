@@ -8,3 +8,8 @@ export type PatientType = {
 }
 
 export type DraftPatientType = Omit<PatientType, 'id'>;
+
+export type PatientStateType = {
+    patients: PatientType[];
+    addPatient: (patient: DraftPatientType) => void;
+}

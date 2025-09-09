@@ -1,13 +1,15 @@
 import { useForm } from "react-hook-form";
 import FormError from "../shared/FormError/FormError";
 import type { DraftPatientType } from "../../types";
+import { usePatientStore } from "../../stores/usePatient.store";
 
 const PatientForm = () => {
+  const { addPatient } = usePatientStore();
   const { register, handleSubmit, formState: {errors} } = useForm<DraftPatientType>();
 
   const registerPatient = (patient: DraftPatientType) => {
-      
-  }
+    addPatient(patient);
+  }    
 
   return (
     <div className="md:w-1/2 lg:w-2/5 mx-5">
