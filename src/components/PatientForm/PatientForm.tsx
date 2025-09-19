@@ -1,23 +1,49 @@
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import FormError from "../shared/FormError/FormError";
 import type { DraftPatientType } from "../../types";
 import { usePatientStore } from "../../stores/usePatient.store";
 
 const PatientForm = () => {
-  const { addPatient } = usePatientStore();
-  const { register, handleSubmit, formState: {errors} } = useForm<DraftPatientType>();
+  const { activePatient, addPatient, updatePatient } = usePatientStore();
+  const { register, handleSubmit, setValue, formState: {errors, isValid}, reset } = useForm<DraftPatientType>();
+  
+  useEffect(() => {
+    if(activePatient) {
+        setValue('name', activePatient.name);
+        setValue('caretaker', activePatient.caretaker);
+        setValue('email', activePatient.email);
+        setValue('date', activePatient.date);
+        setValue('symptoms', activePatient.symptoms);
+    }
+  }, [activePatient]);
 
   const registerPatient = (patient: DraftPatientType) => {
-    addPatient(patient);
-  }    
+    if(activePatient) {
+        updatePatient(patient);
+        toast.success('Paciente editado correctamente!', {
+            position: "bottom-right",
+            autoClose: 3000,
+        });
+    } else {
+        addPatient(patient);
+        toast.success('Paciente registrado correctamente!', {
+            position: "bottom-right",
+            autoClose: 3000,
+        });
+    }
+    reset();
+  }
+
 
   return (
     <div className="md:w-1/2 lg:w-2/5 mx-5">
         <h2 className="font-black text-3xl text-center">Seguimiento Pacientes</h2>
 
         <p className="text-lg mt-5 text-center mb-10">
-            Añade Pacientes y {''}
-            <span className="text-indigo-600 font-bold">Administralos</span>
+            {activePatient ? "Edita los datos del/la paciente:" : "Añade Pacientes y"} {' '}
+            <span className="text-indigo-600 font-bold">{activePatient ? activePatient.name : "Administralos"}</span>
         </p>
 
         <form 
@@ -109,8 +135,9 @@ const PatientForm = () => {
 
             <input
                 type="submit"
-                className="bg-indigo-600 w-full p-3 text-white font-bold hover:bg-indigo-700 cursor-pointer transition-colors"
-                value='Registrar paciente'
+                disabled={!isValid}
+                className="bg-indigo-600 w-full p-3 text-white font-bold hover:bg-indigo-700 cursor-pointer transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed"
+                value={activePatient ? 'Actualizar paciente' : 'Registrar paciente'}
             />
         </form> 
     </div>
